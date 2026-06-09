@@ -207,25 +207,59 @@ private sub Orientacion_canasta_Change()
     with Me.oleobjects("ancho_main").Object
         .clear
         select case dato1
-            case "CVS250"
+            case "CVS250","EZC250","NSX250"
                 Select Case dato2
                     case "Horizontal"
                         .additem "720"
+                    case "Vertical"  
+                        .additem "400" 
+                        .additem "720" 
                 end select
+            case "EZC100","GoPact100","GoPact250"
+                Select Case dato2   
+                    case "Horizontal"
+                        .additem "720"
+                End Select
         end select                
     end with
+    
+End sub
+private sub ancho_main_Change()
+    Dim dato1 as string
+    dim dato2 as string
+    dim dato3 as string
+    dato1= Me.oleobjects("Equipo_canasta").Object.Value
+    dato2= Me.oleobjects("Orientacion_canasta").Object.Value
+    dato3= Me.oleobjects("ancho_main").Object.Value
     with Me.oleobjects("sentido_main").Object
         .clear
         select case dato1
-            case "CVS250"
+            case "CVS250","EZC250"
                 Select Case dato2
                     case "Horizontal"
-                        .additem "Izquierda"
+                        select case dato3
+                            case "720"
+                                .additem "Izquierda"
+                        end select
+                    case "Vertical"  
+                        select case dato3
+                            case "400"
+                                .additem "Inferior" 
+                            case "720"
+                                .additem "Superior"
+                        end select                  
                 end select
+            case "EZC100"
+                Select Case dato2   
+                    case "Horizontal"
+                        select case dato3
+                            case "720"
+                                .additem "Izquierda"
+                        end select
+                End Select    
         end select
     end with
-End sub
-
+end sub
 public sub Buscar_alamacen_main()
     thisworkbook.sheets("frontal GFX").range("JI96:MW187").clear
     thisworkbook.sheets("frontal GFX").range("JI96:MW187").interior.color = &hf2f2f2
@@ -240,10 +274,18 @@ public sub Buscar_alamacen_main()
     select case orientacion
         case "Horizontal"
             orientacion = "HBB"
+        case "Vertical"
+            orientacion = "VBB"
     end select
     select case sentido
         case "Izquierda"
             sentido = "IZQ"
+        case "Derecha"
+            sentido = "DER"
+        case "Superior"
+            sentido = "SPR"
+        case "Inferior"
+            sentido = "INF"
     end select
     resultado = "G_" & orientacion & "XMainX" & equipo & "X" & ancho & "X" & sentido
     msgbox resultado
