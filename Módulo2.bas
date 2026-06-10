@@ -37,6 +37,7 @@ Public Sub Envolventes_GFLX()
         shp.Visible = Not shp.Visible
          ' Oculta los dem�s grupos
         ActiveSheet.Shapes("BARRAS_1").Visible = False
+        activeSheet.Shapes("ALMACEN_GFLX").Visible = False
     End If
 End Sub
 Public Sub BARRAS_GFLX()
@@ -53,5 +54,30 @@ Public Sub BARRAS_GFLX()
         shp.Visible = Not shp.Visible
          ' Oculta los dem�s grupos
         ActiveSheet.Shapes("ENVOLVENTESGFLX").Visible = False
+        activeSheet.Shapes("ALMACEN_GFLX").Visible = False
     End If
 End Sub
+Public sub Almacen_GFLX()
+    Dim shp As Shape
+    Dim groupname As String
+    groupname = "ALMACEN_GFLX"
+    
+    On Error Resume Next
+    Set shp = ActiveSheet.Shapes(groupname)
+    On Error GoTo 0
+    
+    If Not shp Is Nothing Then
+        ' Alterna la visibilidad del grupo seleccionado
+        shp.Visible = Not shp.Visible
+         ' Oculta los dem�s grupos
+        ActiveSheet.Shapes("BARRAS_1").Visible = False
+        ActiveSheet.Shapes("ENVOLVENTESGFLX").Visible = False
+    End If
+End Sub
+
+'=========================
+'RESTABLECER CAJETINES
+'=========================
+Public sub cajetin_GFLX()
+    thisworkbook.sheets("frontal GFX").range("BK43:IM145").clear
+end sub
