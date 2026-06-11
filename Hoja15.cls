@@ -124,7 +124,7 @@ Sub MoverBloque(ref As String, BD As String)
 
     origen.Copy Destination:=destino
 
-    'wsActual.Range(destino, destino.Offset(origen.Rows.Count - 1, origen.Columns.Count - 1)).Select
+    wsActual.Range(destino, destino.Offset(origen.Rows.Count - 1, origen.Columns.Count - 1)).Select
     Exit Sub
 
     errHandler:
@@ -276,7 +276,7 @@ private sub Orientacion_canasta_Change()
         select case dato1
             case "CVS250","EZC250","NSX250"
                 Select Case dato2
-                    case "Horizontal","Vertical" 
+                    case "Horizontal","Vertical","V. Extendida"
                         .additem "720"
                     Case else
                         .additem "No existe bloque en BD"    
@@ -312,11 +312,11 @@ private sub ancho_main_Change()
                 Select Case dato2
                     case "Horizontal"
                         select case dato3
-                            case "720"
+                            case "720" 
                                 .additem "Izquierda"
                                 .additem "Derecha"
                         end select
-                    case "Vertical"  
+                    case "Vertical", "V. Extendida"
                         select case dato3
                             case "720"
                                 .additem "Superior"
@@ -334,7 +334,7 @@ private sub ancho_main_Change()
                 end select
             case "MTZ Fijo" ,"MTZ Extraible","NW Fijo","NW Extraible"
                 Select Case dato2   
-                    case "Horizontal"
+                    case "Vertical"
                         select case dato3
                             case "720"
                                 .additem "Superior"
@@ -358,20 +358,26 @@ public sub Buscar_alamacen_main()
     select case orientacion
         case "Horizontal"
             orientacion = "HBB"
-        case "Vertical"
+        case "Vertical","V. Extendida"
             orientacion = "VBB"
     end select
     select case sentido
         case "Izquierda"
             sentido = "IZQ"
         case "Derecha"
-            sentido = "DER"
+            sentido = "DRC"
         case "Superior"
             sentido = "SPR"
         case "Inferior"
             sentido = "INF"
     end select
+    select case equipo
+        case "NW Fijo":equipo = "NWFijo"
+        case "NW Extraible":equipo = "NWExtraible"
+        case "MTZ Fijo":equipo = "MTZFijo"
+        case "MTZ Extraible":equipo = "MTZExtraible"
+    end select
     resultado_tpower = "T_" & orientacion & "XMainX" & equipo & "X" & ancho & "X" & sentido
     msgbox resultado_tpower
-    'moverbloque resultado_tpower, "TRAZADO_BARRAS"
+    moverbloque resultado_tpower, "TRAZADO_BARRAS"
 End sub
