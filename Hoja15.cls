@@ -1,6 +1,7 @@
 '================== ESPACIO DE TRABAJO G-FELX ====================
 Private Sub Worksheet_Activate()
     LlenarDimensionesENV Me.OLEObjects("DimensionesENV").Object
+    CargarColumna
     with Me.oleobjects("Orientaccion_BRR").Object
         .Clear
         .additem "Horizontal"
@@ -103,11 +104,14 @@ private Sub Amperaje_BRR_Change()
         end select
     end with
 End Sub  
-                      
+ public sub limpiar_area()
+    ThisWorkbook.Sheets("frontal TPW").Range("JI96:MW187").Clear 
+    ThisWorkbook.Sheets("frontal TPW").Range("JI96:MW187").Interior.COLOR = &HF2F2F2
+end sub                     
 
 Sub MoverBloque(ref As String, BD As String)
     Dim origen As Range
-    Dim destino As Range
+    Dim destino As Range 
     Dim wsDatos As Worksheet
     Dim wsActual As Worksheet
 
@@ -164,4 +168,210 @@ public sub Buscar_Barraje()
     End If
     MSgBox resultado_tpower
    
+End sub
+Private Sub CargarColumna()
+    Dim wscanasta As Worksheet
+    Dim ultimaFila As Long
+    Dim i As Long
+    Dim dic As Object
+    
+    Set wscanasta = ThisWorkbook.Sheets("EPanel_Master")
+    Set dic = CreateObject("Scripting.Dictionary")
+    
+    ' Ajusta el 4 si tus datos empiezan en otra fila
+    ultimaFila = wscanasta.Cells(wscanasta.Rows.Count, "A").End(xlUp).Row
+    
+    Me.Columna.Clear
+    Me.Cubiculo.Clear
+    Me.Equipo_canasta.Clear
+    Me.Orientacion_canasta.Clear
+    
+    
+    For i = 4 To ultimaFila
+        If Trim(wscanasta.Cells(i, 1).Value) <> "" Then
+            If Not dic.exists(wscanasta.Cells(i, 1).Value) Then
+                dic.Add wscanasta.Cells(i, 1).Value, Nothing
+                Me.Columna.AddItem wscanasta.Cells(i, 1).Value
+            End If
+        End If
+    Next i
+End Sub
+Private Sub Columna_Change()
+    Dim wscanasta As Worksheet
+    Dim ultimaFila As Long 
+    Dim i As Long
+    Dim dic As Object
+     
+    Set wscanasta = ThisWorkbook.Sheets("EPanel_Master")
+    Set dic = CreateObject("Scripting.Dictionary")
+    
+    ultimaFila = wscanasta.Cells(wscanasta.Rows.Count, "A").End(xlUp).Row
+    
+    Me.Cubiculo.Clear
+    Me.Equipo_canasta.Clear
+    
+    For i = 4 To ultimaFila
+        If wscanasta.Cells(i, 1).Value = Me.Columna.Value Then
+            If Not dic.exists(wscanasta.Cells(i, 2).Value) Then
+                dic.Add wscanasta.Cells(i, 2).Value, Nothing
+                Me.Cubiculo.AddItem wscanasta.Cells(i, 2).Value
+            End If
+        End If
+    Next i
+End Sub
+Private Sub Cubiculo_Change()
+    Dim wscanasta As Worksheet
+    Dim ultimaFila As Long
+    Dim i As Long
+    Dim dic As Object
+    
+    Set wscanasta = ThisWorkbook.Sheets("EPanel_Master")
+    Set dic = CreateObject("Scripting.Dictionary")
+    
+    ultimaFila = wscanasta.Cells(wscanasta.Rows.Count, "A").End(xlUp).Row
+    
+    Me.Equipo_canasta.Clear
+    
+    For i = 4 To ultimaFila
+        If wscanasta.Cells(i, 1).Value = Me.Columna.Value And _
+           wscanasta.Cells(i, 2).Value = Me.Cubiculo.Value Then
+            If Not dic.exists(wscanasta.Cells(i, 3).Value) Then
+                dic.Add wscanasta.Cells(i, 3).Value, Nothing
+                Me.Equipo_canasta.AddItem wscanasta.Cells(i, 3).Value
+            End If
+        End If
+    Next i
+End Sub
+Private Sub Equipo_canasta_Change()
+    Dim wscanasta As Worksheet
+    dim ultimaFila As Long
+    Dim i As Long
+    dim dic As Object
+    
+    Set wscanasta = ThisWorkbook.Sheets("EPanel_Master")
+    set dic = CreateObject("Scripting.Dictionary")
+    
+    ultimaFila = wscanasta.Cells(wscanasta.Rows.Count, "A").End(xlUp).Row
+    
+    Me.Orientacion_canasta.Clear
+    
+    For i = 4 To ultimaFila
+        If wscanasta.Cells(i, 1).Value = Me.Columna.Value And _
+           wscanasta.Cells(i, 2).Value = Me.Cubiculo.Value And _
+           wscanasta.Cells(i, 3).Value = Me.Equipo_canasta.Value Then
+            If Not dic.exists(wscanasta.Cells(i, 4).Value) Then
+                dic.Add wscanasta.Cells(i, 4).Value, Nothing
+                Me.Orientacion_canasta.AddItem wscanasta.Cells(i, 4).Value
+            End If
+        End If
+    Next i
+End Sub
+private sub Orientacion_canasta_Change()
+    Dim dato1 as string
+    dim dato2 as string
+    dato1= Me.oleobjects("Equipo_canasta").Object.Value
+    dato2= Me.oleobjects("Orientacion_canasta").Object.Value
+    with Me.oleobjects("ancho_main").Object
+        .clear
+        select case dato1
+            case "CVS250","EZC250","NSX250"
+                Select Case dato2
+                    case "Horizontal","Vertical" 
+                        .additem "720"
+                    Case else
+                        .additem "No existe bloque en BD"    
+                end select
+            case "EZC100","GoPact100","GoPact250","CVS630","EZC630","GoPact630","NSX630","NS"
+                Select Case dato2   
+                    case "Horizontal"
+                        .additem "720"
+                     Case else
+                        .additem "No existe bloque en BD"    
+                End Select
+            case "MTZ Fijo" ,"MTZ Extraible","NW Fijo","NW Extraible"
+                Select Case dato2   
+                    case "Vertical"
+                        .additem "720"
+                     Case else
+                        .additem "No existe bloque en BD"    
+                End Select
+        end select                
+    end with
+End sub
+private sub ancho_main_Change()
+    Dim dato1 as string
+    dim dato2 as string
+    dim dato3 as string
+    dato1= Me.oleobjects("Equipo_canasta").Object.Value
+    dato2= Me.oleobjects("Orientacion_canasta").Object.Value
+    dato3= Me.oleobjects("ancho_main").Object.Value
+    with Me.oleobjects("sentido_main").Object
+        .clear
+        select case dato1
+            case "CVS250","EZC250","NSX250","NS"
+                Select Case dato2
+                    case "Horizontal"
+                        select case dato3
+                            case "720"
+                                .additem "Izquierda"
+                                .additem "Derecha"
+                        end select
+                    case "Vertical"  
+                        select case dato3
+                            case "720"
+                                .additem "Superior"
+                                .additem "Inferior"
+                        end select 
+                end select         
+            case "EZC100","GoPact100","GoPact250","CVS630","EZC630","GoPact630","NSX630","NS"
+                Select Case dato2
+                    case "Horizontal"
+                        select case dato3 
+                            case "720"
+                                .additem "Izquierda"
+                                .additem "Derecha"
+                        end select           
+                end select
+            case "MTZ Fijo" ,"MTZ Extraible","NW Fijo","NW Extraible"
+                Select Case dato2   
+                    case "Horizontal"
+                        select case dato3
+                            case "720"
+                                .additem "Superior"
+                                .additem "Inferior"
+                        end select
+                End Select    
+        end select
+    end with
+end sub
+public sub Buscar_alamacen_main()
+    thisworkbook.sheets("frontal TPW").range("JI96:MW187").clear
+    ThisWorkbook.Sheets("frontal TPW").Range("JI96:MW187").Interior.COLOR = &HF2F2F2
+    dim orientacion as string
+    dim equipo as string
+    dim ancho as string
+    dim sentido as string
+    orientacion = Me.oleobjects("Orientacion_canasta").Object.Value
+    equipo = Me.oleobjects("Equipo_canasta").Object.Value
+    ancho = Me.oleobjects("ancho_main").Object.Value
+    sentido = Me.oleobjects("sentido_main").Object.Value
+    select case orientacion
+        case "Horizontal"
+            orientacion = "HBB"
+        case "Vertical"
+            orientacion = "VBB"
+    end select
+    select case sentido
+        case "Izquierda"
+            sentido = "IZQ"
+        case "Derecha"
+            sentido = "DER"
+        case "Superior"
+            sentido = "SPR"
+        case "Inferior"
+            sentido = "INF"
+    end select
+    resultado_tpower = "T_" & orientacion & "XMainX" & equipo & "X" & ancho & "X" & sentido
+    msgbox resultado_tpower
+    'moverbloque resultado_tpower, "TRAZADO_BARRAS"
 End sub

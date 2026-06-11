@@ -81,3 +81,7 @@ End Sub
 Public sub cajetin_GFLX()
     thisworkbook.sheets("frontal GFX").range("BK43:IM145").clear
 end sub
+Public sub cajetin_TPOWER()
+    thisworkbook.sheets("frontal TPW").range("BK43:IM145").clear
+end sub
+ 
