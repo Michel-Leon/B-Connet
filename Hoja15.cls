@@ -1,4 +1,4 @@
-'================== ESPACIO DE TRABAJO G-FELX ====================
+'================== ESPACIO DE TRABAJO T-POWER====================
 Private Sub Worksheet_Activate()
     LlenarDimensionesENV Me.OLEObjects("DimensionesENV").Object
     CargarColumna
@@ -94,7 +94,7 @@ private Sub Amperaje_BRR_Change()
             case "Vertical"
                 select case dato3
                     case "630", "1250", "1600", "2000", "2500"
-                        .AddItem "1of4"
+                        '.AddItem "1of4"
                         .AddItem "1of2"
                         .AddItem "3of4"
                         IF altura_portada = "2000" or altura_portada = "2200" Then
