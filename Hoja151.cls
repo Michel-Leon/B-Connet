@@ -2,14 +2,70 @@
 Private Sub Worksheet_Activate()
     LlenarDimensionesENV Me.OLEObjects("DimensionesENV").Object
     CargarColumna
-    with Me.oleobjects("Orientaccion_BRR").Object
-        .Clear
-        .additem "Horizontal"
-        .additem "Vertical"
-    End With
+    CargarColumnaBRR
+    
     'msgbox altura_portada
 End Sub
-Private Sub Orientaccion_BRR_Change()
+Private Sub CargarColumnaBRR()
+    Dim wscanasta As Worksheet
+    Dim ultimaFila As Long
+    Dim i As Long
+    Dim dic As Object
+    
+    Set wscanasta = ThisWorkbook.Sheets("EPanel_Master")
+    Set dic = CreateObject("Scripting.Dictionary")
+    
+    ' Ajusta el 4 si tus datos empiezan en otra fila
+    ultimaFila = wscanasta.Cells(wscanasta.Rows.Count, "A").End(xlUp).Row
+    
+    Me.ColumnaBRR.Clear
+    Me.CubiculoBRR.Clear
+    
+    
+    For i = 4 To ultimaFila
+        If Trim(wscanasta.Cells(i, 1).Value) <> "" Then
+            If Not dic.exists(wscanasta.Cells(i, 1).Value) Then
+                dic.Add wscanasta.Cells(i, 1).Value, Nothing
+                Me.ColumnaBRR.AddItem wscanasta.Cells(i, 1).Value
+            End If
+        End If
+    Next i
+End Sub
+Private Sub ColumnaBRR_Change()
+    Dim wscanasta As Worksheet
+    Dim ultimaFila As Long 
+    Dim i As Long
+    Dim dic As Object
+     
+    Set wscanasta = ThisWorkbook.Sheets("EPanel_Master")
+    Set dic = CreateObject("Scripting.Dictionary")
+    
+    ultimaFila = wscanasta.Cells(wscanasta.Rows.Count, "A").End(xlUp).Row
+    
+    Me.CubiculoBRR.Clear 
+
+    For i = 4 To ultimaFila
+        If Trim(wscanasta.Cells(i, 1).Value) = Trim(Me.ColumnaBRR.Value) Then
+            If Not dic.exists(Trim(wscanasta.Cells(i, 2).Value)) Then
+                dic.Add Trim(wscanasta.Cells(i, 2).Value), Nothing
+                Me.CubiculoBRR.AddItem Trim(wscanasta.Cells(i, 2).Value)
+            End If
+        End If
+    Next i
+    With Me.OLEObjects("Orientaccion_BRR").Object
+        .Clear
+        Select case Me.ColumnaBRR.Value
+            Case "+NB1", "+NB2", "+NB3", "+NB4", "+NB5", "+NB6", "+NB7", "+NB8", "+NB9", "+NB10"
+                .AddItem "Vertical"
+            case "+NE1", "+NE2", "+NE3", "+NE4", "+NE5", "+NE6", "+NE7", "+NE8", "+NE9", "+NE10"
+                .AddItem "Horizontal"
+            case else
+                .AddItem "Horizontal"
+                .AddItem "Vertical"    
+        End Select
+    End With
+End Sub
+Private Sub Orientaccion_BRR_Change() 
     Dim dato1 As String
     dato1 = Me.OLEObjects("Orientaccion_BRR").Object.Value
 
@@ -142,11 +198,12 @@ End sub
 public sub Buscar_Barraje()
     ThisWorkbook.Sheets("frontal TPW").Range("JI96:MW187").Clear
     ThisWorkbook.Sheets("frontal TPW").Range("JI96:MW187").Interior.COLOR = &HF2F2F2
-    dim dato1 As String, dato2 As String, dato3 As String, dato4 As String
+    dim dato1 As String, dato2 As String, dato3 As String, dato4 As String, EtiquetaC As String
     dato1 = Me.oleobjects("Orientaccion_BRR").Object.Value
     dato2 = Me.oleobjects("Tipobrr_").Object.Value
     dato3 = Me.oleobjects("Amperaje_BRR").Object.Value
     dato4 = Me.oleobjects("Ancho_BRR").Object.Value
+    EtiquetaC = Me.oleobjects("CubiculoBRR").Object.Value
     select case dato1
         case "Horizontal":dato1 = "H"
         case "Vertical":dato1 = "V"
@@ -164,10 +221,11 @@ public sub Buscar_Barraje()
         MoverBloque resultado_tpower, "HBB_TN"
     ElseIf dato1 = "V" And dato2 = "BB" Then
         resultado_tpower = "T_" & dato1 & dato2 & "X" & dato3 & "X" & dato4 & "X" & altura_portada
+        Activesheet.Range("JM99").value = EtiquetaC
         MoverBloque resultado_tpower, "VBB"
     End If
     MSgBox resultado_tpower
-   
+    
 End sub
 Private Sub CargarColumna()
     Dim wscanasta As Worksheet

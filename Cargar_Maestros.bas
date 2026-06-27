@@ -181,18 +181,23 @@ Sub Cargar_Desde_Maestro()
                 Next i
                 listaCoinc = listaCoinc & vbCrLf & "Ingrese el numero (1 a " & numCoinc & "):"
 
-                Dim selCoinc As Variant
-                selCoinc = Application.InputBox( _
+                Dim selCoinc As String
+                selCoinc = Trim(InputBox( _
                     Prompt:=listaCoinc, _
-                    Title:="Seleccionar entre coincidencias", _
-                    Type:=1)
+                    Title:="Seleccionar entre coincidencias"))
 
-                If selCoinc = False Then Exit Sub
-                If selCoinc < 1 Or selCoinc > numCoinc Then
+                If selCoinc = "" Then Exit Sub
+                If Not IsNumeric(selCoinc) Then
+                    MsgBox "Ingrese un numero valido.", vbExclamation
+                    Exit Sub
+                End If
+                Dim numSelCoinc As Long
+                numSelCoinc = CLng(selCoinc)
+                If numSelCoinc < 1 Or numSelCoinc > numCoinc Then
                     MsgBox "Numero fuera de rango. Debe ser entre 1 y " & numCoinc & ".", vbExclamation
                     Exit Sub
                 End If
-                indiceSeleccionado = coincidencias(CLng(selCoinc))
+                indiceSeleccionado = coincidencias(numSelCoinc)
             End If
         End If
 
@@ -211,19 +216,24 @@ Sub Cargar_Desde_Maestro()
 
         listaTexto = listaTexto & vbCrLf & "Ingrese el numero (1 a " & numCarpetas & "):"
 
-        Dim seleccion As Variant
-        seleccion = Application.InputBox( _
+        Dim seleccion As String
+        seleccion = Trim(InputBox( _
             Prompt:=listaTexto, _
-            Title:="Seleccionar proyecto maestro", _
-            Type:=1)
+            Title:="Seleccionar proyecto maestro"))
 
-        If seleccion = False Then Exit Sub
-        If seleccion < 1 Or seleccion > numCarpetas Then
+        If seleccion = "" Then Exit Sub
+        If Not IsNumeric(seleccion) Then
+            MsgBox "Ingrese un numero valido.", vbExclamation
+            Exit Sub
+        End If
+        Dim numSel As Long
+        numSel = CLng(seleccion)
+        If numSel < 1 Or numSel > numCarpetas Then
             MsgBox "Numero fuera de rango. Debe ser entre 1 y " & numCarpetas & ".", vbExclamation
             Exit Sub
         End If
 
-        indiceSeleccionado = CLng(seleccion)
+        indiceSeleccionado = numSel
     End If
 
     '----------------------------------------------------
